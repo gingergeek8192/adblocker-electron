@@ -8,7 +8,7 @@ A fork of [@ghostery/adblocker](https://github.com/ghostery/adblocker) refactore
 
 ```json
 "dependencies": {
-  "@ghostery/adblocker-electron": "github:yourusername/adblocker-onBeforeRequest#main"
+  "adblocker-electron": "github:yourusername/adblocker-electron#main"
 }
 ```
 
@@ -21,7 +21,7 @@ pnpm install
 ### Load the blocker
 
 ```js
-import { ElectronBlocker } from '@ghostery/adblocker-electron'
+import { ElectronBlocker } from 'adblocker-electron'
 
 const blocker = await ElectronBlocker.fromUpdated(fetch)
 ```

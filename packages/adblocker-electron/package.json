@@ -1,5 +1,5 @@
 {
-  "name": "@ghostery/adblocker-electron",
+  "name": "adblocker-electron",
   "version": "2.18.2",
   "description": "Ghostery adblocker Electron wrapper",
   "author": {
