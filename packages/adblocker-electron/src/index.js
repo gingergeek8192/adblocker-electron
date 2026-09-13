@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { join, basename } from 'node:path';
 import { app } from 'electron';
 import { parse } from 'tldts-experimental';
@@ -40,14 +40,18 @@ export class ElectronBlocker extends FiltersEngine {
       LIST_URLS.map(async (url) => {
         const res = await fetchImpl(url);
         const text = await res.text();
-        await writeFile(join(dir, basename(url)), text);
-        return text;
+        const dest = join(dir, basename(url));
+        await writeFile(dest + '.tmp', text);
+        return { text, dest };
       })
     );
     const resources = await fetchResources(fetchImpl);
-    await writeFile(join(dir, 'resources.json'), resources);
+    await writeFile(join(dir, 'resources.json.tmp'), resources);
+    // all fetches succeeded — atomically rename into place
+    for (const { dest } of texts) await rename(dest + '.tmp', dest);
+    await rename(join(dir, 'resources.json.tmp'), join(dir, 'resources.json'));
     await writeFile(join(dir, 'lastUpdate'), Date.now().toString());
-    return { texts, resources };
+    return { texts: texts.map(t => t.text), resources };
   }
 
   static async _isStale() {
