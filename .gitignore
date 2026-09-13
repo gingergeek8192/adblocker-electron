@@ -1,21 +1,10 @@
-engine.bin
-dist
 node_modules
-.nyc_output
 .DS_Store
-.tsbuildinfo
+*.tsbuildinfo
+.nyc_output
 
-bench/dataset/chromedriver
-bench/dataset/ext.zip
-bench/dataset/requests.json
-bench/.bench.json
-
-.changelog/
-**/.yarn/
-!/.yarn/
-/.yarn/*
-!/.yarn/patches/
-!/.yarn/patches/**
+# tshy build artifacts (intermediate, not needed)
 .tshy/
 .tshy-build/
-.migration-test/
+
+# keep packages/adblocker/dist — required for github installs
