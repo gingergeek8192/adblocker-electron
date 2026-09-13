@@ -1,7 +1,27 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { join, basename } from 'node:path';
+import { app } from 'electron';
 import { parse } from 'tldts-experimental';
-import { FiltersEngine, Request } from '@ghostery/adblocker';
+import { FiltersEngine, Request, fetchResources } from '@ghostery/adblocker';
 
 const FOUR_DAYS = 4 * 24 * 60 * 60 * 1000;
+
+const LIST_URLS = [
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/easylist/easylist.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/easylist/easyprivacy.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/peter-lowe/serverlist.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/badware.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/filters-2020.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/filters-2021.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/filters-2022.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/filters-2023.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/filters-2024.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/filters.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/privacy.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/quick-fixes.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/resource-abuse.txt',
+  'https://raw.githubusercontent.com/ghostery/adblocker/master/packages/adblocker/assets/ublock-origin/unbreak.txt',
+];
 
 export class ElectronBlocker extends FiltersEngine {
   constructor(...args) {
@@ -9,15 +29,60 @@ export class ElectronBlocker extends FiltersEngine {
     this.webContents = null;
   }
 
+  static _dir() {
+    return join(app.getPath('userData'), 'filterList');
+  }
+
+  static async _fetchAndSave(fetchImpl) {
+    const dir = ElectronBlocker._dir();
+    await mkdir(dir, { recursive: true });
+    const texts = await Promise.all(
+      LIST_URLS.map(async (url) => {
+        const res = await fetchImpl(url);
+        const text = await res.text();
+        await writeFile(join(dir, basename(url)), text);
+        return text;
+      })
+    );
+    const resources = await fetchResources(fetchImpl);
+    await writeFile(join(dir, 'resources.json'), resources);
+    return { texts, resources };
+  }
+
+  static async _loadFromDisk() {
+    const dir = ElectronBlocker._dir();
+    const texts = await Promise.all(
+      LIST_URLS.map((url) => readFile(join(dir, basename(url)), 'utf8'))
+    );
+    const resources = await readFile(join(dir, 'resources.json'), 'utf8');
+    return { texts, resources };
+  }
+
+  static _buildEngine({ texts, resources }) {
+    const engine = ElectronBlocker.parse(texts.join('\n'));
+    engine.updateResources(resources, '' + resources.length);
+    return engine;
+  }
+
   static async fromUpdated(fetchImpl = fetch) {
-    const engine = await ElectronBlocker.fromPrebuiltAdsAndTracking(fetchImpl);
+    let data;
+    try {
+      data = await ElectronBlocker._loadFromDisk();
+      console.log('[adblocker] loaded from disk');
+    } catch {
+      console.log('[adblocker] fetching lists');
+      data = await ElectronBlocker._fetchAndSave(fetchImpl);
+    }
+    const engine = ElectronBlocker._buildEngine(data);
     engine._scheduleUpdates(fetchImpl);
     return engine;
   }
 
   _scheduleUpdates(fetchImpl) {
     const check = async () => {
-      const fresh = await ElectronBlocker.fromPrebuiltAdsAndTracking(fetchImpl);
+      console.log('[adblocker] updating lists');
+      const data = await ElectronBlocker._fetchAndSave(fetchImpl);
+      const fresh = ElectronBlocker._buildEngine(data);
       Object.assign(this, fresh);
       console.log('[adblocker] engine swapped');
       this._updateTimer = setTimeout(check, FOUR_DAYS);
