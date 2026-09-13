@@ -6,7 +6,7 @@ Electron adblocker wrapper. The blocker does **not** own the `onBeforeRequest` h
 
 ```json
 "dependencies": {
-  "adblocker-electron": "github:gingergeek8192/adblocker-electron#master"
+  "adblocker-electron": "github:gingergeek8192/adblocker-electron#master&path:/packages/adblocker-electron"
 }
 ```
 
