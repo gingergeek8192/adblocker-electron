@@ -1,6 +1,14 @@
-# @ghostery/adblocker-electron
+# adblocker-electron
 
 Electron adblocker wrapper. The blocker does **not** own the `onBeforeRequest` handler — you wire it up yourself and call `gard(url)`. Cosmetics are injected via CDP debugger. Filter lists are fetched and rebuilt automatically every 4 days.
+
+## Install
+
+```json
+"dependencies": {
+  "adblocker-electron": "github:gingergeek8192/adblocker-electron#master"
+}
+```
 
 ## API
 
@@ -9,6 +17,8 @@ Electron adblocker wrapper. The blocker does **not** own the `onBeforeRequest` h
 Loads the engine from Ghostery's CDN and schedules an automatic rebuild every 4 days. The running engine is swapped atomically when new lists are available.
 
 ```js
+import { ElectronBlocker } from 'adblocker-electron'
+
 const blocker = await ElectronBlocker.fromUpdated(fetch)
 ```
 

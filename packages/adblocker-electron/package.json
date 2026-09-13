@@ -1,11 +1,7 @@
 {
   "name": "adblocker-electron",
-  "version": "2.18.2",
-  "description": "Ghostery adblocker Electron wrapper",
-  "author": {
-    "name": "Ghostery"
-  },
-  "homepage": "https://github.com/ghostery/adblocker#readme",
+  "version": "1.0.0",
+  "description": "Electron adblocker — you own the onBeforeRequest handler",
   "license": "MPL-2.0",
   "type": "module",
   "exports": {
@@ -13,61 +9,15 @@
     ".": "./src/index.js"
   },
   "main": "./src/index.js",
-  "files": [
-    "LICENSE",
-    "dist"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/ghostery/adblocker.git",
-    "directory": "packages/adblocker-electron"
+    "url": "git+https://github.com/gingergeek8192/adblocker-electron.git"
   },
-  "bugs": {
-    "url": "https://github.com/ghostery/adblocker/issues"
-  },
-  "scripts": {},
   "peerDependencies": {
     "electron": ">11"
   },
   "dependencies": {
     "@ghostery/adblocker": "^2.18.2",
     "tldts-experimental": "^7.4.10"
-  },
-  "contributors": [
-    {
-      "name": "Rémi Berson",
-      "email": "remi@cliqz.com"
-    },
-    {
-      "name": "Zhonghao Yu",
-      "email": "zhonghao@cliqz.com"
-    },
-    {
-      "name": "Krzysztof Jan Modras",
-      "email": "chrmod@chrmod.net"
-    },
-    {
-      "name": "Raymond Hill",
-      "email": "gorhill@users.noreply.github.com"
-    },
-    {
-      "name": "Eleni",
-      "email": "eleni@cliqz.com"
-    },
-    {
-      "name": "ecnmst",
-      "email": "ecnmst@users.noreply.github.com"
-    },
-    {
-      "name": "Asif",
-      "email": "arshadasif0312@gmail.com"
-    },
-    {
-      "name": "Anton Lazarev",
-      "email": "antonok35@gmail.com"
-    }
-  ]
+  }
 }
