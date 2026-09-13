@@ -8,7 +8,7 @@ A fork of [@ghostery/adblocker](https://github.com/ghostery/adblocker) refactore
 
 ```json
 "dependencies": {
-  "adblocker-electron": "github:yourusername/adblocker-electron#main"
+"adblocker-electron": "github:gingergeek8192/adblocker-electron#master"
 }
 ```
 
