@@ -46,7 +46,17 @@ export class ElectronBlocker extends FiltersEngine {
     );
     const resources = await fetchResources(fetchImpl);
     await writeFile(join(dir, 'resources.json'), resources);
+    await writeFile(join(dir, 'lastUpdate'), Date.now().toString());
     return { texts, resources };
+  }
+
+  static async _isStale() {
+    try {
+      const ts = await readFile(join(ElectronBlocker._dir(), 'lastUpdate'), 'utf8');
+      return (Date.now() - parseInt(ts)) > FOUR_DAYS;
+    } catch {
+      return true;
+    }
   }
 
   static async _loadFromDisk() {
@@ -66,10 +76,16 @@ export class ElectronBlocker extends FiltersEngine {
 
   static async fromUpdated(fetchImpl = fetch) {
     let data;
-    try {
-      data = await ElectronBlocker._loadFromDisk();
-      console.log('[adblocker] loaded from disk');
-    } catch {
+    let stale = await ElectronBlocker._isStale();
+    if (!stale) {
+      try {
+        data = await ElectronBlocker._loadFromDisk();
+        console.log('[adblocker] loaded from disk');
+      } catch {
+        stale = true;
+      }
+    }
+    if (stale) {
       console.log('[adblocker] fetching lists');
       data = await ElectronBlocker._fetchAndSave(fetchImpl);
     }
