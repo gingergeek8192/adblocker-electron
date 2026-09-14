@@ -1,5 +1,7 @@
 # Adblocker
 
+## DO NOT USE THIS!...  This is embarrassing!!! I allowed amazonQ to write code. I didn't check it at all. I will write this properly myself!.. What a waste of time and money! All the real human lives that could have been changed forever.. but no. Lets waste money on the most retarded pile of shit ever!
+
 Efficient, minimal Electron adblocker — uBlock Origin and Easylist compatible.
 
 A fork of [@ghostery/adblocker](https://github.com/ghostery/adblocker) refactored so the blocker does **not** own the `onBeforeRequest` handler. You wire up your own request handler and call the blocker's methods directly. Cosmetics are injected via CDP debugger. Filter lists are managed and updated automatically every 4 days.
